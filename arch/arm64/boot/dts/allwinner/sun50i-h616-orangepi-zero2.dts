@@ -81,6 +81,24 @@
 		regulator-always-on;
 		enable-active-high;
 	};
+
+	sound-spdif {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "sun50i-h6-spdif";
+
+		simple-audio-card,cpu {
+			sound-dai = <&spdif>;
+		};
+
+		simple-audio-card,codec {
+			sound-dai = <&spdif_out>;
+		};
+	};
+
+	spdif_out: spdif-out {
+		#sound-dai-cells = <0>;
+		compatible = "linux,spdif-dit";
+	};
 };
 
 &cpu0 {
@@ -289,6 +307,11 @@
 			};
 		};
 	};
+};
+
+
+&spdif {
+	status = "okay";
 };
 
 &spi0  {
