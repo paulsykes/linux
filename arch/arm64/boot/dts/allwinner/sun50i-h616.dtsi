@@ -562,7 +562,7 @@
 		};
 
 		ahub_i2s3: ahub-i2s3@0x05097000 {
-			//#sound-dai-cells = <0>;
+			#sound-dai-cells = <0>;
 			compatible = "allwinner,sunxi-ahub-daudio";
 			reg = <0x5097000 0xadf>;
 			clocks = <&ccu CLK_BUS_AUDIO_HUB>,
