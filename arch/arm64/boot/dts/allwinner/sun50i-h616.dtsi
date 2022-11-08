@@ -302,7 +302,7 @@
 				function = "i2c2";
 			};
 
-			i2c3_pins: i2c3-pins {
+			i2c3_ph_pins: i2c3-pins {
 				pins = "PH4", "PH5";
 				function = "i2c3";
 			};
