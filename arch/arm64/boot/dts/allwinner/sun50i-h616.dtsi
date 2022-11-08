@@ -482,9 +482,8 @@
 			reg = <0x05096000 0x31c>;
 			interrupts = <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&ccu CLK_BUS_AUDIO_CODEC>,
-				 <&ccu CLK_AUDIO_CODEC_1X>,
 				 <&ccu CLK_AUDIO_CODEC_4X>;
-			clock-names = "apb", "audio-codec-1x", "audio-codec-4x";
+			clock-names = "apb", "codec";
 			resets = <&ccu RST_BUS_AUDIO_CODEC>;
 			dmas = <&dma 6>;
 			dma-names = "tx";
