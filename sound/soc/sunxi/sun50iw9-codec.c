@@ -124,27 +124,6 @@ struct sun50i_h616_codec {
 	struct snd_dmaengine_dai_dma_data	playback_dma_data;
 };
 
-static void sun50i_h616_codec_start_playback(struct sun50i_h616_codec *scodec)
-{
-	/* Flush TX FIFO */
-	regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-			   BIT(SUNXI_DAC_FIFOC_FIFO_FLUSH),
-			   BIT(SUNXI_DAC_FIFOC_FIFO_FLUSH));
-
-	/* Enable DAC DRQ */
-	regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-			   BIT(SUNXI_DAC_FIFOC_DAC_DRQ_EN),
-			   BIT(SUNXI_DAC_FIFOC_DAC_DRQ_EN));
-}
-
-static void sun50i_h616_codec_stop_playback(struct sun50i_h616_codec *scodec)
-{
-	/* Disable DAC DRQ */
-	regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-			   BIT(SUNXI_DAC_FIFOC_DAC_DRQ_EN),
-			   0);
-}
-
 static int sun50i_h616_codec_trigger(struct snd_pcm_substream *substream, int cmd,
 			       struct snd_soc_dai *dai)
 {
@@ -262,55 +241,6 @@ static int sun50i_h616_codec_get_hw_rate(struct snd_pcm_hw_params *params)
 	default:
 		return -EINVAL;
 	}
-}
-
-static int sun50i_h616_codec_hw_params_playback(struct sun50i_h616_codec *scodec,
-					  struct snd_pcm_hw_params *params,
-					  unsigned int hwrate)
-{
-	u32 val;
-
-	/* Set DAC sample rate */
-	regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-			   7 << SUNXI_DAC_FIFOC_DAC_FS,
-			   hwrate << SUNXI_DAC_FIFOC_DAC_FS);
-
-	/* Set the number of channels we want to use */
-	if (params_channels(params) == 1)
-		val = BIT(SUNXI_DAC_FIFOC_MONO_EN);
-	else
-		val = 0;
-
-	regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-			   BIT(SUNXI_DAC_FIFOC_MONO_EN),
-			   val);
-
-	/* Set the number of sample bits to either 16 or 24 bits */
-	if (hw_param_interval(params, SNDRV_PCM_HW_PARAM_SAMPLE_BITS)->min == 32) {
-		regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-				   BIT(SUNXI_DAC_FIFOC_TX_SAMPLE_BITS),
-				   BIT(SUNXI_DAC_FIFOC_TX_SAMPLE_BITS));
-
-		/* Set TX FIFO mode to padding the LSBs with 0 */
-		regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-				   BIT(SUNXI_DAC_FIFOC_TX_FIFO_MODE),
-				   0);
-
-		scodec->playback_dma_data.addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
-	} else {
-		regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-				   BIT(SUNXI_DAC_FIFOC_TX_SAMPLE_BITS),
-				   0);
-
-		/* Set TX FIFO mode to repeat the MSB */
-		regmap_update_bits(scodec->regmap, SUNXI_DAC_FIFOC,
-				   BIT(SUNXI_DAC_FIFOC_TX_FIFO_MODE),
-				   BIT(SUNXI_DAC_FIFOC_TX_FIFO_MODE));
-
-		scodec->playback_dma_data.addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES;
-	}
-
-	return 0;
 }
 
 struct sample_rate {
@@ -829,6 +759,7 @@ static struct attribute_group audio_debug_attr_group = {
 
 static void sunxi_codec_init(struct sun50i_h616_codec *scodec)
 {
+#if 0
 	/* Disable DRC function for playback */
 	regmap_write(scodec->regmap, SUNXI_DAC_DAP_CTL, 0);
 
@@ -874,6 +805,7 @@ static void sunxi_codec_init(struct sun50i_h616_codec *scodec)
 		regmap_update_bits(scodec->regmap, SUNXI_DAC_AC_RAMP_REG,
 				(0x7 << SUNXI_RAMP_STEP), (0x1 << SUNXI_RAMP_STEP));
 	}
+#endif
 }
 
 static int sun50i_h616_codec_probe(struct platform_device *pdev)
