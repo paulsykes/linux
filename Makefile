@@ -549,7 +549,7 @@ LDFLAGS_MODULE  =
 CFLAGS_KERNEL	=
 RUSTFLAGS_KERNEL =
 AFLAGS_KERNEL	=
-export LDFLAGS_vmlinux =
+LDFLAGS_vmlinux =
 
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE    := \
@@ -1248,6 +1248,11 @@ vmlinux.o modules.builtin.modinfo modules.builtin: vmlinux_o
 	@:
 
 PHONY += vmlinux
+# LDFLAGS_vmlinux flags from the top Makefile and arch/*/Makefile should be
+# exported for building the top vmlinux, but not for building decompressors.
+# They happen to have the same base name (arch/*/boot/compressed/vmlinux).
+# The decompressor Makefiles should not inherit LDFLAGS_vmlinux.
+vmlinux: export LDFLAGS_vmlinux := $(LDFLAGS_vmlinux)
 vmlinux: vmlinux.o $(KBUILD_LDS) modpost
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux
 
